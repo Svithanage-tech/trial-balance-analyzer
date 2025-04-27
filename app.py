@@ -76,22 +76,39 @@ if current_file and last_file:
     # Step 3: Variance Analysis
     st.header("3. Variance Analysis")
 
+    # Add slider for users to choose the variance percentage threshold
+    variance_threshold = st.slider(
+        "Set Variance Percentage Threshold",
+        min_value=0,
+        max_value=50,
+        value=10,  # default value
+        step=1,
+        help="Select the minimum percentage variance for highlighting"
+    )
+    st.write(f"Variance Threshold Set to: {variance_threshold}%")
+
+    # Apply variance threshold logic
+    merged_tb["Variance Highlighted"] = merged_tb["Variance %"].apply(
+        lambda x: x > variance_threshold if pd.notnull(x) else False
+    )
+
     st.dataframe(merged_tb[["Account Code", "Account Name_Current", "Balance_Last", "Balance_Current", 
-                            "Variance Amount", "Variance %"]].style.format({
+                            "Variance Amount", "Variance %", "Variance Highlighted"]].style.format({
         "Balance_Last": "{:,.2f}",
         "Balance_Current": "{:,.2f}",
         "Variance Amount": "{:,.2f}",
-        "Variance %": "{:.2f}%"
+        "Variance %": "{:.2f}%",
+        "Variance Highlighted": lambda v: "✅" if v else "❌"
     }), use_container_width=True)
 
     # Step 4: Generate Smart Questions
     st.header("4. Generated Questions for Team")
-    st.info("Questions are based on variances greater than 10% or $1,000 difference.")
+    st.info("Questions are based on variances greater than set threshold percentage.")
 
     questions = []
 
     for idx, row in merged_tb.iterrows():
-        if abs(row["Variance Amount"]) > 1000 or (abs(row["Variance %"]) > 10):
+        if row["Variance Highlighted"]:
             account = row["Account Name_Current"]
             variance = row["Variance Amount"]
             percent = row["Variance %"]
