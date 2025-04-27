@@ -45,6 +45,8 @@ if current_file and last_file:
     expense_keywords = ['Expense', 'Cost', 'Salary', 'Rent', 'Depreciation']
 
     def categorize_account(name):
+        # Ensure name is a string and handle NaN values
+        name = str(name) if name is not np.nan else ""
         if any(word.lower() in name.lower() for word in income_keywords):
             return "Income"
         elif any(word.lower() in name.lower() for word in expense_keywords):
