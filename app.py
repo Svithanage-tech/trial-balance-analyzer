@@ -87,9 +87,9 @@ if current_file and last_file:
     )
     st.write(f"Variance Threshold Set to: {variance_threshold}%")
 
-    # Apply variance threshold logic
+    # Apply variance threshold logic for both positive and negative variances
     merged_tb["Variance Highlighted"] = merged_tb["Variance %"].apply(
-        lambda x: x > variance_threshold if pd.notnull(x) else False
+        lambda x: abs(x) >= variance_threshold if pd.notnull(x) else False
     )
 
     st.dataframe(merged_tb[["Account Code", "Account Name_Current", "Balance_Last", "Balance_Current", 
@@ -103,7 +103,7 @@ if current_file and last_file:
 
     # Step 4: Generate Smart Questions
     st.header("4. Generated Questions for Team")
-    st.info("Questions are based on variances greater than set threshold percentage.")
+    st.info("Questions are based on variances greater than or equal to the selected percentage threshold.")
 
     questions = []
 
