@@ -19,9 +19,13 @@ if current_file and last_file:
     
     # Preprocess: Create Balance Column
     def preprocess_tb(df):
-        df["Balance"] = df["Debit"].fillna(0) - df["Credit"].fillna(0)
-        return df[["Account Code", "Account Name", "Balance"]]
-    
+        df.columns = df.columns.str.strip().str.lower()  # Clean column names to lower case
+        if 'debit' not in df.columns or 'credit' not in df.columns:
+            st.error("❌ Missing 'Debit' or 'Credit' columns in your uploaded file. Please check and upload the correct format.")
+            st.stop()
+        df["balance"] = df["debit"].fillna(0) - df["credit"].fillna(0)
+        return df.rename(columns={"account code": "Account Code", "account name": "Account Name", "balance": "Balance"})
+
     current_tb = preprocess_tb(current_tb)
     last_tb = preprocess_tb(last_tb)
     
